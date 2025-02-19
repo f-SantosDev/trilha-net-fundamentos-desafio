@@ -1,3 +1,6 @@
+using System.Globalization;
+using System.Text.RegularExpressions;
+
 namespace DesafioFundamentos.Models
 {
     public class Estacionamento
@@ -14,34 +17,87 @@ namespace DesafioFundamentos.Models
 
         public void AdicionarVeiculo()
         {
-            // TODO: Pedir para o usuário digitar uma placa (ReadLine) e adicionar na lista "veiculos"
-            // *IMPLEMENTE AQUI*
-            Console.WriteLine("Digite a placa do veículo para estacionar:");
+            // *IMPLEMENTADO*
+            string placa = ValidaPlaca();
+
+            veiculos.Add(placa);
+        }
+        
+        private string ValidaPlaca(){
+
+            string placa;
+            do
+            {
+                Console.WriteLine("Digite a placa do veículo para estacionar:");
+                placa = Console.ReadLine().ToUpper();
+
+                // Verifica se a placa já está cadastrada
+                if(veiculos.Contains(placa))
+                {
+                    Console.WriteLine("Esta placa já está cadastrada.\n");
+                    placa = "";
+                }
+                else
+                {
+                    // Verifica se a placa possui padrão válido
+                    if (placa.Length != 7)
+                    {
+                        Console.WriteLine("A placa é inválida.\n");
+                        placa = "";
+                    }
+                    else
+                    {
+                        // Padrão antigo (LLLNNNN)
+                        string padraoAntigo = "^[A-Z]{3}[0-9]{4}$";
+                        
+                        // Padrão Mercosul (LLLNLLN)
+                        string padraoMercosul = "^[A-Z]{3}[0-9][A-Z]{2}[0-9]$";
+
+                        if (!Regex.IsMatch(placa, padraoAntigo) && !Regex.IsMatch(placa, padraoMercosul))
+                        {
+                            Console.WriteLine("A placa é inválida.\n");
+                            placa = "";
+                        }
+                    }
+                }
+
+            } while (placa == String.Empty);
+
+            return placa;
         }
 
         public void RemoverVeiculo()
         {
             Console.WriteLine("Digite a placa do veículo para remover:");
 
-            // Pedir para o usuário digitar a placa e armazenar na variável placa
-            // *IMPLEMENTE AQUI*
-            string placa = "";
+            // *IMPLEMENTADO*
+            string placa = Console.ReadLine().ToUpper();
 
             // Verifica se o veículo existe
             if (veiculos.Any(x => x.ToUpper() == placa.ToUpper()))
             {
                 Console.WriteLine("Digite a quantidade de horas que o veículo permaneceu estacionado:");
-
-                // TODO: Pedir para o usuário digitar a quantidade de horas que o veículo permaneceu estacionado,
-                // TODO: Realizar o seguinte cálculo: "precoInicial + precoPorHora * horas" para a variável valorTotal                
-                // *IMPLEMENTE AQUI*
+                
+                // *IMPLEMENTADO*
                 int horas = 0;
                 decimal valorTotal = 0; 
 
-                // TODO: Remover a placa digitada da lista de veículos
-                // *IMPLEMENTE AQUI*
+                bool isConvert = false;
+                do
+                {
+                    isConvert = int.TryParse(Console.ReadLine(), out horas);
 
-                Console.WriteLine($"O veículo {placa} foi removido e o preço total foi de: R$ {valorTotal}");
+                    if (!isConvert)
+                        Console.WriteLine($"Por favor, digite a quantidade de horas que o veículo {placa} permaneceu estacionado:");
+
+                } while (!isConvert);
+
+                valorTotal = precoInicial + precoPorHora * horas;
+
+                // *IMPLEMENTADO*
+                veiculos.Remove(placa);
+
+                Console.WriteLine($"O veículo {placa} foi removido e o preço total foi de: {valorTotal.ToString("C", new CultureInfo("pt-BR"))}");
             }
             else
             {
@@ -55,8 +111,10 @@ namespace DesafioFundamentos.Models
             if (veiculos.Any())
             {
                 Console.WriteLine("Os veículos estacionados são:");
-                // TODO: Realizar um laço de repetição, exibindo os veículos estacionados
-                // *IMPLEMENTE AQUI*
+                
+                // *IMPLEMENTADO*
+                foreach (var veiculo in veiculos)
+                    Console.WriteLine(veiculo);
             }
             else
             {
